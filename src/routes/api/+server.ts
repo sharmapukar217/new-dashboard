@@ -17,11 +17,6 @@ if (typeof window === "undefined") {
 }
 
 
-let prisma;
-if(typeof window === "undefined") {
-	prisma = new PrismaClient()
-}
-
 export async function GET() {
 	let users;
 	if(typeof window === 'undefined') {
