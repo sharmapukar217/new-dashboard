@@ -1,0 +1,124 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  DEVELOPER
+  SUPERUSER
+  ADMINUSER
+  BASICUSER
+  VENDORUSER
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  username      String?   @unique
+  password      String
+  image         String?
+  email         String    @unique
+  phoneNumber   String?
+  emailVerified DateTime?
+  role          Role      @default(BASICUSER)
+  vendorId      String    @db.ObjectId
+  vendor        Vendor    @relation(name: "UserVendor", fields: [vendorId], references: [id])
+  // accounts      Account[] @relation(name: "UserAccount")
+  createdAt     DateTime  @default(now())
+
+  @@map("users")
+}
+
+model Vendor {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String   @unique
+  location     String
+  email        String   @unique
+  phoneNumber  String?
+  mainVendor   Vendor?  @relation(name: "VendorVendor", fields: [mainVendorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  mainVendorId String?  @db.ObjectId
+  users        User[]   @relation(name: "UserVendor")
+  records      Record[] @relation(name: "VendorRecord")
+  subVendors   Vendor[] @relation(name: "VendorVendor")
+  createdAt    DateTime @default(now())
+
+  @@map("vendors")
+}
+
+model Record {
+  // static data
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  referenceId     String
+  customerName    String
+  customerNumber  String
+  customerAddress String
+  vendorId        String @db.ObjectId
+  vendor          Vendor @relation(name: "VendorRecord", fields: [vendorId], references: [id])
+  cod             Float
+  status          Status
+
+  pickup   Assign?
+  delivery Assign?
+  return   Assign?
+
+  clientPaymentDate         DateTime?
+  clientPaymentMethod       PaymentMethod @default(NOT_PAID)
+  clientPaymentVerifiedDate DateTime?
+  clientPaymentVerifiedBy   String?
+  vendorPaymentDate         DateTime?
+  vendorPaymentMethod       PaymentMethod @default(NOT_PAID)
+  vendorPaymentVerifiedDate DateTime?
+  vendorPaymentVerifiedBy   String?
+  paymentsVerifiedBy        String?
+  paymentsVerifiedDate      DateTime?
+
+  createdAt DateTime @default(now())
+
+  // logs RecordLog[] @relation(name: "RecordLog")
+  @@map("records")
+}
+
+
+enum RecordStatus {
+  ORDER_CREATED
+  PICKUP_REQUEST
+  PICKUP_PROCESSING
+  PICKUP_VERIFIED
+  DELIVERY_PROCESSING
+  DELIVERY_POSPONED
+  DELIVERED
+  DELIVERY_CANCELLED
+  RETURN_TO_VENDOR
+}
+
+type Status {
+  updatedBy String
+  updatedAt DateTime     @default(now())
+  current   RecordStatus @default(ORDER_CREATED)
+}
+
+type Assign {
+  assignedBy String
+  assignedAt DateTime
+  assignedTo String
+  status     AssignStatus @default(NOT_ASSIGNED)
+}
+
+enum AssignStatus {
+  NOT_ASSIGNED
+  PENDING
+  REJECTED
+  ACCEPTED
+}
+
+enum PaymentMethod {
+  NOT_PAID
+  PAID_ONLINE
+  PAID_BY_CASH
+  PAID_THROUGH_BANK
+  DIRECTLY_TO_VENDOR
+}
