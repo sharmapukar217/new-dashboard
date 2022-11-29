@@ -1,5 +1,5 @@
 {
-  "name": "@sharmapukar217/dashboard",
+	"name": "@sharmapukar217/dashboard",
 	"version": "0.0.1",
 	"type": "module",
 	"private": true,
@@ -14,6 +14,7 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "next",
+		"@sveltejs/adapter-vercel": "1.0.0-next.84",
 		"@sveltejs/kit": "next",
 		"@typescript-eslint/eslint-plugin": "^5.45.0",
 		"@typescript-eslint/parser": "^5.45.0",
@@ -33,8 +34,19 @@
 		"useTabs": true,
 		"printWidth": 100,
 		"trailingComma": "none",
-		"pluginSearchDirs": ["."],
-		"plugins": ["prettier-plugin-svelte"],
-		"overrides": [{ "files": "*.svelte", "options": { "parser": "svelte" } }]
+		"pluginSearchDirs": [
+			"."
+		],
+		"plugins": [
+			"prettier-plugin-svelte"
+		],
+		"overrides": [
+			{
+				"files": "*.svelte",
+				"options": {
+					"parser": "svelte"
+				}
+			}
+		]
 	}
 }
